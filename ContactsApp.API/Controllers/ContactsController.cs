@@ -1,6 +1,7 @@
 ﻿using ContactsApp.API.Models.Domain;
-using ContactsApp.API.Models.DTO;
+using ContactsApp.API.Models.DTO.ContactsDtos;
 using ContactsApp.API.Repositories.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,13 +10,35 @@ namespace ContactsApp.API.Controllers
     // URL: https://localhost:7195/api/contacts
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Reader,Writer")]
     public class ContactsController : ControllerBase
     {
         private readonly IGenericRepository<Contact> contactsRepository;
+        private readonly ILogger<ContactsController> logger1;
 
-        public ContactsController(IGenericRepository<Contact> contactsRepository)
+        public ContactsController(IGenericRepository<Contact> contactsRepository,
+            ILogger<ContactsController> logger1)
         {
             this.contactsRepository = contactsRepository;
+            this.logger1 = logger1;
+        }
+
+        // URL: baseUrl/api/categories/dene
+        [HttpPost]
+        [Route("dene")]
+        public async Task<IActionResult> DoSomething([FromBody] int num1)
+        {
+            try
+            {
+                int num2 = 100;
+                int result = num2 / num1;
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                logger1.LogError(ex, "Error Occured!!");
+                return BadRequest("Cannot divide by zero.");
+            }
         }
 
         // URL: https://localhost:7195/api/contacts
@@ -50,6 +73,7 @@ namespace ContactsApp.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllContacts()
         {
+            //logger1.LogInformation($"Request coming to get all contacts");
             var contacts = await contactsRepository.GetAllEntitiesAsync();
             var response = new List<ContactDto>();
 

@@ -1,4 +1,4 @@
-﻿namespace ContactsApp.API.Models.DTO
+﻿namespace ContactsApp.API.Models.DTO.ContactsDtos
 {
     public class UpdateContactRequestDTO
     {
